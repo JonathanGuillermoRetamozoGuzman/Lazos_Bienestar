@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Lazos de Bienestar – Consultorio Psicológico</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --navy:      #0b1f3a;
+      --navy-mid:  #122d52;
+      --blue:      #1a4a7a;
+      --blue-mid:  #2563a8;
+      --sky:       #4a9ede;
+      --sky-light: #7ec3f0;
+      --ice:       #ddeeff;
+      --white:     #ffffff;
+      --cream:     #f4f8fd;
+      --gold:      #e8c96a;
+      --gold-soft: #f5e4a0;
+      --text-mid:  #3a5272;
+      --text-soft: #6a8aaa;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Outfit', sans-serif; background: var(--navy); color: var(--white); overflow-x: hidden; }
+
+    #neural-canvas { position: fixed; inset: 0; z-index: 0; pointer-events: none; opacity: .45; }
+
+    /* NAV */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1.1rem 5%;
+      background: rgba(11,31,58,0.88); backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(74,158,222,0.15);
+      animation: fadeDown .6s ease both;
+    }
+    .nav-logo { font-family: 'Cormorant Garamond', serif; font-size: 1.4rem; font-weight: 700; color: var(--white); }
+    .nav-logo span { color: var(--sky); }
+    .nav-links { display: flex; gap: 2rem; list-style: none; }
+    .nav-links a { text-decoration: none; color: rgba(255,255,255,.55); font-size: .88rem; transition: color .25s; }
+    .nav-links a:hover { color: var(--sky-light); }
+    .nav-cta {
+      background: linear-gradient(135deg, var(--sky), var(--blue-mid));
+      color: var(--white); padding: .55rem 1.5rem; border-radius: 50px;
+      text-decoration: none; font-size: .88rem; font-weight: 500;
+      transition: all .25s; box-shadow: 0 4px 16px rgba(74,158,222,.3);
+    }
+    .nav-cta:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(74,158,222,.45); }
+
+    /* HERO */
+    #hero {
+      position: relative; z-index: 1; min-height: 100vh;
+      display: flex; align-items: center; padding: 8rem 5% 5rem; overflow: hidden;
+    }
+    .hero-glow { position: absolute; border-radius: 50%; filter: blur(80px); pointer-events: none; }
+    .glow-1 { width: 600px; height: 600px; background: radial-gradient(circle, rgba(37,99,168,.35) 0%, transparent 70%); top: -100px; right: -100px; animation: glowPulse 6s ease-in-out infinite; }
+    .glow-2 { width: 400px; height: 400px; background: radial-gradient(circle, rgba(74,158,222,.2) 0%, transparent 70%); bottom: 0; left: 10%; animation: glowPulse 8s ease-in-out infinite reverse; }
+    @keyframes glowPulse { 0%,100%{opacity:.6;transform:scale(1)} 50%{opacity:1;transform:scale(1.1)} }
+
+    .hero-inner { display: grid; grid-template-columns: 1.1fr 1fr; gap: 4rem; align-items: center; width: 100%; }
+    .hero-content { animation: fadeUp .9s .2s ease both; }
+
+    .hero-pill {
+      display: inline-flex; align-items: center; gap: .5rem;
+      border: 1px solid rgba(74,158,222,.35); background: rgba(74,158,222,.08);
+      color: var(--sky-light); padding: .4rem 1.1rem; border-radius: 50px;
+      font-size: .8rem; font-weight: 500; margin-bottom: 1.8rem; letter-spacing: .04em;
+    }
+    .pill-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--sky); animation: blink 2s ease-in-out infinite; }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+    h1 { font-family: 'Cormorant Garamond', serif; font-size: clamp(2.8rem,5.5vw,4.4rem); line-height: 1.1; font-weight: 700; margin-bottom: 1.4rem; }
+    h1 .accent {
+      display: block; font-style: italic;
+      background: linear-gradient(90deg, var(--sky-light), var(--gold));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .hero-desc { font-size: 1rem; color: rgba(255,255,255,.6); line-height: 1.8; max-width: 500px; margin-bottom: 2.4rem; font-weight: 300; }
+    .hero-btns { display: flex; gap: 1rem; flex-wrap: wrap; }
+    .btn-primary {
+      display: inline-flex; align-items: center; gap: .55rem;
+      background: linear-gradient(135deg, var(--sky), var(--blue-mid));
+      color: var(--white); padding: .9rem 2.1rem; border-radius: 50px;
+      text-decoration: none; font-size: .95rem; font-weight: 500;
+      transition: all .3s; box-shadow: 0 6px 24px rgba(74,158,222,.4);
+    }
+    .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 12px 32px rgba(74,158,222,.5); }
+    .btn-ghost {
+      display: inline-flex; align-items: center; gap: .55rem;
+      border: 1px solid rgba(74,158,222,.4); color: var(--sky-light);
+      padding: .9rem 2.1rem; border-radius: 50px; text-decoration: none;
+      font-size: .95rem; font-weight: 400; transition: all .3s;
+    }
+    .btn-ghost:hover { background: rgba(74,158,222,.1); border-color: var(--sky); transform: translateY(-2px); }
+
+    /* ORB */
+    .hero-visual { position: relative; display: flex; justify-content: center; align-items: center; animation: fadeUp .9s .4s ease both; }
+    .mind-orb {
+      width: 300px; height: 300px; border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, rgba(74,158,222,.3) 0%, rgba(26,74,122,.5) 40%, rgba(11,31,58,.8) 80%);
+      border: 1px solid rgba(74,158,222,.25);
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 0 60px rgba(74,158,222,.2), inset 0 0 60px rgba(74,158,222,.05);
+      animation: orbFloat 6s ease-in-out infinite;
+      font-size: 4rem; position: relative; z-index: 1;
+    }
+    @keyframes orbFloat { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-14px)} }
+    .orb-ring { position: absolute; border-radius: 50%; border: 1px solid rgba(74,158,222,.12); animation: ringPulse 4s ease-in-out infinite; }
+    .ring-1 { width: 370px; height: 370px; }
+    .ring-2 { width: 440px; height: 440px; animation-delay: 1.2s; }
+    .ring-3 { width: 510px; height: 510px; animation-delay: 2.4s; }
+    @keyframes ringPulse { 0%,100%{opacity:.4} 50%{opacity:.12} }
+    .orb-badge {
+      position: absolute; z-index: 2;
+      background: rgba(11,31,58,.92); border: 1px solid rgba(74,158,222,.3);
+      border-radius: 14px; padding: .65rem 1rem;
+      display: flex; align-items: center; gap: .55rem;
+      font-size: .79rem; color: var(--white); white-space: nowrap;
+      backdrop-filter: blur(8px);
+    }
+    .badge-a { top: 10px; right: -10px; animation: bfloat1 5s ease-in-out infinite; }
+    .badge-b { bottom: 20px; left: -10px; animation: bfloat2 6s ease-in-out infinite; }
+    .badge-c { top: 48%; right: -55px; animation: bfloat1 7s ease-in-out infinite; }
+    @keyframes bfloat1 { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+    @keyframes bfloat2 { 0%,100%{transform:translateY(0)} 50%{transform:translateY(8px)} }
+
+    /* STATS */
+    .stats-bar {
+      position: relative; z-index: 1;
+      background: rgba(255,255,255,.04);
+      border-top: 1px solid rgba(74,158,222,.1); border-bottom: 1px solid rgba(74,158,222,.1);
+      padding: 2rem 5%; display: flex; justify-content: center; gap: 5rem; flex-wrap: wrap;
+    }
+    .stat { text-align: center; }
+    .stat-num {
+      font-family: 'Cormorant Garamond', serif; font-size: 2.2rem; font-weight: 700;
+      background: linear-gradient(135deg, var(--sky-light), var(--gold-soft));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .stat-label { font-size: .78rem; color: rgba(255,255,255,.4); margin-top: .2rem; }
+
+    /* SECTIONS */
+    section { position: relative; z-index: 1; padding: 6rem 5%; }
+    .eyebrow {
+      display: inline-flex; align-items: center; gap: .5rem;
+      color: var(--sky); font-size: .78rem; font-weight: 500;
+      letter-spacing: .1em; text-transform: uppercase; margin-bottom: 1rem;
+    }
+    .eyebrow::before { content:''; display:block; width:24px; height:1px; background:var(--sky); }
+    .sec-title { font-family: 'Cormorant Garamond', serif; font-size: clamp(2rem,3.5vw,2.8rem); font-weight: 700; line-height: 1.2; color: var(--white); margin-bottom: 1rem; }
+    .sec-title em { font-style: italic; color: var(--sky-light); }
+    .sec-desc { color: rgba(255,255,255,.5); font-size: .95rem; line-height: 1.8; max-width: 520px; font-weight: 300; }
+
+    /* SERVICIOS */
+    #servicios { background: rgba(255,255,255,.02); }
+    .servicios-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(260px,1fr)); gap: 1.5rem; margin-top: 3rem; }
+    .s-card {
+      background: rgba(255,255,255,.04); border: 1px solid rgba(74,158,222,.12);
+      border-radius: 20px; padding: 2rem 1.8rem; transition: all .35s; position: relative; overflow: hidden;
+    }
+    .s-card::before {
+      content:''; position:absolute; top:0; left:0; right:0; height:2px;
+      background: linear-gradient(90deg, var(--sky), var(--gold));
+      transform:scaleX(0); transform-origin:left; transition:transform .4s;
+    }
+    .s-card:hover { background: rgba(74,158,222,.08); border-color: rgba(74,158,222,.3); transform: translateY(-5px); box-shadow: 0 16px 40px rgba(11,31,58,.5); }
+    .s-card:hover::before { transform: scaleX(1); }
+    .s-icon { width:52px; height:52px; background:rgba(74,158,222,.12); border:1px solid rgba(74,158,222,.2); border-radius:14px; display:flex; align-items:center; justify-content:center; font-size:1.5rem; margin-bottom:1.2rem; }
+    .s-title { font-family:'Cormorant Garamond',serif; font-size:1.2rem; font-weight:600; color:var(--white); margin-bottom:.6rem; }
+    .s-desc { font-size:.86rem; color:rgba(255,255,255,.5); line-height:1.7; font-weight:300; }
+
+    /* EQUIPO */
+    .equipo-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(270px,1fr)); gap:2rem; margin-top:3rem; }
+    .psi-card { background:rgba(255,255,255,.04); border:1px solid rgba(74,158,222,.12); border-radius:24px; overflow:hidden; transition:all .35s; }
+    .psi-card:hover { border-color:rgba(74,158,222,.35); transform:translateY(-6px); box-shadow:0 20px 50px rgba(11,31,58,.5); }
+    .psi-top { height:180px; display:flex; align-items:center; justify-content:center; font-size:4.5rem; position:relative; }
+    .pt1{background:linear-gradient(135deg,#0d2d55,#1a4a7a)} .pt2{background:linear-gradient(135deg,#1a3a6a,#2563a8)} .pt3{background:linear-gradient(135deg,#0f2640,#1d4570)}
+    .psi-glow { position:absolute; inset:0; background:radial-gradient(circle at 50% 80%,rgba(74,158,222,.2) 0%,transparent 60%); }
+    .psi-body { padding:1.5rem 1.8rem 1.8rem; }
+    .psi-name { font-family:'Cormorant Garamond',serif; font-size:1.2rem; font-weight:700; color:var(--white); margin-bottom:.2rem; }
+    .psi-role { font-size:.75rem; color:var(--sky); text-transform:uppercase; letter-spacing:.07em; font-weight:500; margin-bottom:.8rem; }
+    .psi-desc { font-size:.85rem; color:rgba(255,255,255,.5); line-height:1.65; margin-bottom:1rem; font-weight:300; }
+    .psi-tags { display:flex; gap:.4rem; flex-wrap:wrap; }
+    .ptag { background:rgba(74,158,222,.1); border:1px solid rgba(74,158,222,.2); color:var(--sky-light); padding:.2rem .7rem; border-radius:50px; font-size:.73rem; }
+
+    /* HORARIOS */
+    #horarios { background: rgba(255,255,255,.02); }
+    .h-layout { display:grid; grid-template-columns:1.1fr 1fr; gap:3rem; margin-top:3rem; align-items:start; }
+    .h-wrap { background:rgba(255,255,255,.03); border:1px solid rgba(74,158,222,.12); border-radius:20px; overflow:hidden; }
+    .h-table { width:100%; border-collapse:collapse; }
+    .h-table thead { background:rgba(74,158,222,.08); }
+    .h-table th { padding:1rem 1.2rem; text-align:left; font-size:.75rem; font-weight:500; color:var(--sky); text-transform:uppercase; letter-spacing:.08em; }
+    .h-table td { padding:.9rem 1.2rem; color:rgba(255,255,255,.75); border-top:1px solid rgba(74,158,222,.07); font-size:.88rem; }
+    .hbadge { display:inline-block; background:rgba(74,158,222,.12); border:1px solid rgba(74,158,222,.2); color:var(--sky-light); padding:.18rem .65rem; border-radius:50px; font-size:.78rem; }
+    .hclosed { color:rgba(255,255,255,.2)!important; font-style:italic; }
+    .h-cards { display:flex; flex-direction:column; gap:1.2rem; }
+    .h-card { background:rgba(255,255,255,.04); border:1px solid rgba(74,158,222,.12); border-radius:16px; padding:1.4rem; display:flex; gap:1rem; align-items:flex-start; transition:border-color .25s; }
+    .h-card:hover { border-color:rgba(74,158,222,.3); }
+    .h-card-icon { width:42px; height:42px; flex-shrink:0; background:rgba(74,158,222,.1); border-radius:11px; display:flex; align-items:center; justify-content:center; font-size:1.1rem; }
+    .h-card-label { font-size:.73rem; color:var(--sky); font-weight:500; letter-spacing:.05em; text-transform:uppercase; margin-bottom:.3rem; }
+    .h-card-val { font-size:.88rem; color:rgba(255,255,255,.7); line-height:1.5; }
+
+    /* CONTACTO */
+    .c-layout { display:grid; grid-template-columns:1fr 1.1fr; gap:4rem; margin-top:3rem; align-items:center; }
+    .wa-box { background:rgba(255,255,255,.04); border:1px solid rgba(74,158,222,.15); border-radius:28px; padding:3rem 2.5rem; text-align:center; position:relative; overflow:hidden; }
+    .wa-box::before { content:''; position:absolute; inset:0; border-radius:28px; background:radial-gradient(circle at 50% 0%,rgba(37,211,102,.06) 0%,transparent 60%); pointer-events:none; }
+    .wa-orb { width:80px; height:80px; background:linear-gradient(135deg,#25d366,#128c7e); border-radius:50%; margin:0 auto 1.5rem; display:flex; align-items:center; justify-content:center; font-size:2.2rem; box-shadow:0 8px 32px rgba(37,211,102,.4); animation:orbFloat 5s ease-in-out infinite; }
+    .wa-title { font-family:'Cormorant Garamond',serif; font-size:1.6rem; color:var(--white); margin-bottom:.7rem; font-weight:700; }
+    .wa-desc { font-size:.9rem; color:rgba(255,255,255,.5); line-height:1.7; margin-bottom:1.8rem; font-weight:300; }
+    .btn-wa { display:inline-flex; align-items:center; gap:.6rem; background:linear-gradient(135deg,#25d366,#128c7e); color:var(--white); padding:.95rem 2.3rem; border-radius:50px; text-decoration:none; font-size:.95rem; font-weight:500; transition:all .3s; box-shadow:0 6px 24px rgba(37,211,102,.35); }
+    .btn-wa:hover { transform:translateY(-3px); box-shadow:0 12px 32px rgba(37,211,102,.45); }
+    .why-list { display:flex; flex-direction:column; gap:1.5rem; }
+    .why-item { display:flex; gap:1.2rem; align-items:flex-start; padding:1.4rem; background:rgba(255,255,255,.03); border:1px solid rgba(74,158,222,.1); border-radius:16px; transition:all .3s; }
+    .why-item:hover { border-color:rgba(74,158,222,.25); background:rgba(74,158,222,.05); }
+    .why-icon { width:46px; height:46px; flex-shrink:0; background:rgba(74,158,222,.1); border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:1.3rem; }
+    .why-title { font-size:.95rem; font-weight:500; color:var(--white); margin-bottom:.3rem; }
+    .why-desc { font-size:.84rem; color:rgba(255,255,255,.45); line-height:1.6; font-weight:300; }
+
+    /* FOOTER */
+    footer { position:relative; z-index:1; background:rgba(0,0,0,.3); border-top:1px solid rgba(74,158,222,.1); padding:3rem 5% 2rem; text-align:center; }
+    .f-logo { font-family:'Cormorant Garamond',serif; font-size:1.6rem; font-weight:700; color:var(--white); margin-bottom:.4rem; }
+    .f-logo span { color:var(--sky); }
+    .f-sub { font-size:.82rem; color:rgba(255,255,255,.35); margin-bottom:1.5rem; }
+    .f-links { display:flex; gap:2rem; justify-content:center; flex-wrap:wrap; margin-bottom:2rem; }
+    .f-links a { color:rgba(255,255,255,.4); text-decoration:none; font-size:.83rem; transition:color .2s; }
+    .f-links a:hover { color:var(--sky-light); }
+    .f-copy { font-size:.75rem; color:rgba(255,255,255,.2); }
+
+    /* ANIMATIONS */
+    @keyframes fadeUp { from{opacity:0;transform:translateY(32px)} to{opacity:1;transform:translateY(0)} }
+    @keyframes fadeDown { from{opacity:0;transform:translateY(-20px)} to{opacity:1;transform:translateY(0)} }
+    .reveal { opacity:0; transform:translateY(24px); transition:opacity .7s ease,transform .7s ease; }
+    .reveal.visible { opacity:1; transform:translateY(0); }
+
+    /* RESPONSIVE */
+    @media(max-width:900px) {
+      .hero-inner { grid-template-columns:1fr; text-align:center; }
+      .hero-desc { margin:0 auto 2rem; }
+      .hero-btns { justify-content:center; }
+      .hero-visual { margin-top:3rem; }
+      .h-layout,.c-layout { grid-template-columns:1fr; }
+      .nav-links { display:none; }
+      .stats-bar { gap:2rem; }
+    }
+    @media(max-width:500px) {
+      section { padding:4rem 6%; }
+      .mind-orb { width:240px; height:240px; }
+      .ring-1{width:290px;height:290px} .ring-2{width:340px;height:340px} .ring-3{display:none}
+      .badge-a,.badge-b,.badge-c { display:none; }
+    }
+  </style>
+</head>
+<body>
+
+<canvas id="neural-canvas"></canvas>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">Lazos de <span>Bienestar</span></div>
+  <ul class="nav-links">
+    <li><a href="#servicios">Servicios</a></li>
+    <li><a href="#equipo">Equipo</a></li>
+    <li><a href="#horarios">Horarios</a></li>
+    <li><a href="#contacto">Contacto</a></li>
+  </ul>
+  <a href="https://wa.me/51999999999?text=Hola,%20quiero%20agendar%20una%20cita" target="_blank" class="nav-cta">Agendar cita</a>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-glow glow-1"></div>
+  <div class="hero-glow glow-2"></div>
+  <div class="hero-inner">
+    <div class="hero-content">
+      <div class="hero-pill"><span class="pill-dot"></span> Consultorio Psicológico · Lima, Perú</div>
+      <h1>
+        Tu bienestar<br/>
+        <span class="accent">comienza aquí.</span>
+      </h1>
+      <p class="hero-desc">En Lazos de Bienestar acompañamos a niños y jóvenes hacia una vida emocional plena. Porque cada mente merece cuidado, atención y esperanza.</p>
+      <div class="hero-btns">
+        <a href="https://wa.me/51999999999?text=Hola,%20quiero%20agendar%20una%20cita" target="_blank" class="btn-primary">💬 Escribir por WhatsApp</a>
+        <a href="#servicios" class="btn-ghost">Conocer servicios →</a>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="orb-ring ring-1"></div>
+      <div class="orb-ring ring-2"></div>
+      <div class="orb-ring ring-3"></div>
+      <div class="mind-orb">🧠</div>
+      <div class="orb-badge badge-a">🌟 Enfoque humanista</div>
+      <div class="orb-badge badge-b">🔒 100% confidencial</div>
+      <div class="orb-badge badge-c">💙 Niños &amp; Jóvenes</div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<div class="stats-bar">
+  <div class="stat"><div class="stat-num">+200</div><div class="stat-label">Pacientes atendidos</div></div>
+  <div class="stat"><div class="stat-num">3</div><div class="stat-label">Especialistas</div></div>
+  <div class="stat"><div class="stat-num">6</div><div class="stat-label">Días de atención</div></div>
+  <div class="stat"><div class="stat-num">100%</div><div class="stat-label">Confidencialidad</div></div>
+</div>
+
+<!-- SERVICIOS -->
+<section id="servicios">
+  <div class="eyebrow">Nuestros Servicios</div>
+  <h2 class="sec-title">Atención pensada <em>para cada etapa</em></h2>
+  <p class="sec-desc">Servicios especializados para niños, adolescentes y familias, adaptados a las necesidades únicas de cada persona.</p>
+  <div class="servicios-grid">
+    <div class="s-card reveal"><div class="s-icon">🧸</div><div class="s-title">Psicología Infantil</div><div class="s-desc">Acompañamos a niños de 3 a 12 años en el manejo de emociones, conducta y aprendizaje con técnicas lúdicas y terapia de juego.</div></div>
+    <div class="s-card reveal"><div class="s-icon">🌱</div><div class="s-title">Psicología Adolescente</div><div class="s-desc">Espacio de escucha para jóvenes de 13 a 18 años que atraviesan ansiedad, identidad y presión académica.</div></div>
+    <div class="s-card reveal"><div class="s-icon">👨‍👩‍👧</div><div class="s-title">Terapia Familiar</div><div class="s-desc">Fortalecemos los vínculos familiares y acompañamos a las familias ante situaciones de crisis o cambio.</div></div>
+    <div class="s-card reveal"><div class="s-icon">📋</div><div class="s-title">Evaluación Psicológica</div><div class="s-desc">Pruebas estandarizadas para detectar dificultades de aprendizaje, atención y desarrollo emocional con informes detallados.</div></div>
+    <div class="s-card reveal"><div class="s-icon">💻</div><div class="s-title">Sesiones Online</div><div class="s-desc">Atención remota por videollamada con la misma calidad y confidencialidad de la sesión presencial.</div></div>
+    <div class="s-card reveal"><div class="s-icon">🏫</div><div class="s-title">Orientación Escolar</div><div class="s-desc">Coordinamos con colegios para apoyar el desempeño académico, la convivencia y la inclusión educativa.</div></div>
+  </div>
+</section>
+
+<!-- EQUIPO -->
+<section id="equipo">
+  <div class="eyebrow">Nuestro Equipo</div>
+  <h2 class="sec-title">Profesionales que <em>te acompañan</em></h2>
+  <p class="sec-desc">Un equipo comprometido con el bienestar emocional de cada niño y joven que llega a nuestra consulta.</p>
+  <div class="equipo-grid">
+    <div class="psi-card reveal">
+      <div class="psi-top pt1"><div class="psi-glow"></div>👩‍⚕️</div>
+      <div class="psi-body">
+        <div class="psi-name">Ps. María González</div>
+        <div class="psi-role">Psicóloga Infantil</div>
+        <div class="psi-desc">Especialista en terapia de juego y desarrollo infantil con más de 8 años acompañando a niños y sus familias.</div>
+        <div class="psi-tags"><span class="ptag">Terapia de Juego</span><span class="ptag">Desarrollo Infantil</span></div>
+      </div>
+    </div>
+    <div class="psi-card reveal">
+      <div class="psi-top pt2"><div class="psi-glow"></div>👨‍⚕️</div>
+      <div class="psi-body">
+        <div class="psi-name">Ps. Carlos Mendoza</div>
+        <div class="psi-role">Psicólogo Adolescente</div>
+        <div class="psi-desc">Especializado en acompañamiento de jóvenes con ansiedad e identidad mediante terapia cognitivo-conductual.</div>
+        <div class="psi-tags"><span class="ptag">TCC</span><span class="ptag">Ansiedad</span><span class="ptag">Identidad</span></div>
+      </div>
+    </div>
+    <div class="psi-card reveal">
+      <div class="psi-top pt3"><div class="psi-glow"></div>👩‍⚕️</div>
+      <div class="psi-body">
+        <div class="psi-name">Ps. Ana Torres</div>
+        <div class="psi-role">Terapeuta Familiar</div>
+        <div class="psi-desc">Especialista en dinámica familiar y vínculos afectivos. Acompaña a familias en momentos de transición y duelo.</div>
+        <div class="psi-tags"><span class="ptag">Familia</span><span class="ptag">Vínculos</span><span class="ptag">Duelo</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HORARIOS -->
+<section id="horarios">
+  <div class="eyebrow">Horarios de Atención</div>
+  <h2 class="sec-title">¿Cuándo puedes <em>visitarnos?</em></h2>
+  <p class="sec-desc">Horarios flexibles de lunes a sábado para adaptarnos a tu rutina y la de tu familia.</p>
+  <div class="h-layout">
+    <div class="h-wrap reveal">
+      <table class="h-table">
+        <thead><tr><th>Día</th><th>Mañana</th><th>Tarde</th></tr></thead>
+        <tbody>
+          <tr><td>Lunes</td><td><span class="hbadge">9:00 – 13:00</span></td><td><span class="hbadge">15:00 – 19:00</span></td></tr>
+          <tr><td>Martes</td><td><span class="hbadge">9:00 – 13:00</span></td><td><span class="hbadge">15:00 – 19:00</span></td></tr>
+          <tr><td>Miércoles</td><td><span class="hbadge">9:00 – 13:00</span></td><td><span class="hbadge">15:00 – 19:00</span></td></tr>
+          <tr><td>Jueves</td><td><span class="hbadge">9:00 – 13:00</span></td><td><span class="hbadge">15:00 – 19:00</span></td></tr>
+          <tr><td>Viernes</td><td><span class="hbadge">9:00 – 13:00</span></td><td><span class="hbadge">15:00 – 18:00</span></td></tr>
+          <tr><td>Sábado</td><td><span class="hbadge">9:00 – 13:00</span></td><td class="hclosed">Cerrado</td></tr>
+          <tr><td>Domingo</td><td class="hclosed">Cerrado</td><td class="hclosed">Cerrado</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="h-cards reveal">
+      <div class="h-card"><div class="h-card-icon">📍</div><div><div class="h-card-label">Dirección</div><div class="h-card-val">Av. Bienestar 123, Miraflores<br/>Lima, Perú</div></div></div>
+      <div class="h-card"><div class="h-card-icon">📞</div><div><div class="h-card-label">WhatsApp / Teléfono</div><div class="h-card-val">+51 999 999 999</div></div></div>
+      <div class="h-card"><div class="h-card-icon">✉️</div><div><div class="h-card-label">Correo</div><div class="h-card-val">contacto@lazosdebienestar.pe</div></div></div>
+      <div class="h-card"><div class="h-card-icon">💻</div><div><div class="h-card-label">Modalidades</div><div class="h-card-val">Presencial y Online (Zoom / Meet)</div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACTO -->
+<section id="contacto">
+  <div class="eyebrow">Contáctanos</div>
+  <h2 class="sec-title">Da el primer <em>paso hoy</em></h2>
+  <p class="sec-desc">Escríbenos por WhatsApp y con gusto te orientamos sobre el servicio más adecuado para ti o tu hijo.</p>
+  <div class="c-layout">
+    <div class="wa-box reveal">
+      <div class="wa-orb">💬</div>
+      <div class="wa-title">Escríbenos por WhatsApp</div>
+      <div class="wa-desc">Respondemos en menos de 24 horas. Consulta disponibilidad, precios o cualquier duda antes de tu primera sesión.</div>
+      <a href="https://wa.me/51999999999?text=Hola,%20me%20gustar%C3%ADa%20obtener%20m%C3%A1s%20informaci%C3%B3n%20sobre%20sus%20servicios" target="_blank" class="btn-wa">💬 Iniciar conversación</a>
+    </div>
+    <div class="why-list reveal">
+      <div class="why-item"><div class="why-icon">🔒</div><div><div class="why-title">Total confidencialidad</div><div class="why-desc">Todo lo compartido en sesión es estrictamente privado bajo el código de ética del psicólogo.</div></div></div>
+      <div class="why-item"><div class="why-icon">💙</div><div><div class="why-title">Sin juicios, con empatía</div><div class="why-desc">Creamos un espacio de escucha activa donde cada persona se siente valorada y comprendida.</div></div></div>
+      <div class="why-item"><div class="why-icon">📅</div><div><div class="why-title">Citas flexibles</div><div class="why-desc">Nos adaptamos a tu horario con sesiones presenciales y virtuales de lunes a sábado.</div></div></div>
+      <div class="why-item"><div class="why-icon">🌟</div><div><div class="why-title">Primera consulta orientativa</div><div class="why-desc">La primera sesión está orientada a conocerte y definir juntos el mejor camino terapéutico.</div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="f-logo">Lazos de <span>Bienestar</span></div>
+  <div class="f-sub">Consultorio Psicológico · Niños y Jóvenes · Lima, Perú</div>
+  <div class="f-links">
+    <a href="#servicios">Servicios</a>
+    <a href="#equipo">Equipo</a>
+    <a href="#horarios">Horarios</a>
+    <a href="#contacto">Contacto</a>
+    <a href="https://wa.me/51999999999" target="_blank">WhatsApp</a>
+  </div>
+  <div class="f-copy">© 2025 Lazos de Bienestar. Todos los derechos reservados.</div>
+</footer>
+
+<script>
+// NEURAL CANVAS
+const canvas = document.getElementById('neural-canvas');
+const ctx = canvas.getContext('2d');
+let W, H, nodes = [];
+const mouse = { x: -999, y: -999 };
+
+function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
+
+function initNodes() {
+  nodes = Array.from({ length: 60 }, () => ({
+    x: Math.random() * W, y: Math.random() * H,
+    vx: (Math.random() - .5) * .4, vy: (Math.random() - .5) * .4,
+    r: Math.random() * 2 + 1.5
+  }));
+}
+
+function draw() {
+  ctx.clearRect(0, 0, W, H);
+  for (let i = 0; i < nodes.length; i++) {
+    for (let j = i + 1; j < nodes.length; j++) {
+      const dx = nodes[i].x - nodes[j].x, dy = nodes[i].y - nodes[j].y;
+      const d = Math.sqrt(dx*dx + dy*dy);
+      if (d < 160) {
+        ctx.beginPath();
+        ctx.strokeStyle = `rgba(74,158,222,${(1 - d/160) * .4})`;
+        ctx.lineWidth = .8;
+        ctx.moveTo(nodes[i].x, nodes[i].y);
+        ctx.lineTo(nodes[j].x, nodes[j].y);
+        ctx.stroke();
+      }
+    }
+    const mdx = nodes[i].x - mouse.x, mdy = nodes[i].y - mouse.y;
+    const md = Math.sqrt(mdx*mdx + mdy*mdy);
+    if (md < 200) {
+      ctx.beginPath();
+      ctx.strokeStyle = `rgba(232,201,106,${(1 - md/200) * .6})`;
+      ctx.lineWidth = 1;
+      ctx.moveTo(nodes[i].x, nodes[i].y);
+      ctx.lineTo(mouse.x, mouse.y);
+      ctx.stroke();
+    }
+    ctx.beginPath(); ctx.arc(nodes[i].x, nodes[i].y, nodes[i].r, 0, Math.PI*2);
+    ctx.fillStyle = 'rgba(74,158,222,.7)'; ctx.fill();
+    ctx.beginPath(); ctx.arc(nodes[i].x, nodes[i].y, nodes[i].r+3, 0, Math.PI*2);
+    ctx.fillStyle = 'rgba(74,158,222,.1)'; ctx.fill();
+  }
+}
+
+function update() {
+  nodes.forEach(n => {
+    n.x += n.vx; n.y += n.vy;
+    if (n.x < 0 || n.x > W) n.vx *= -1;
+    if (n.y < 0 || n.y > H) n.vy *= -1;
+  });
+}
+
+(function loop() { update(); draw(); requestAnimationFrame(loop); })();
+
+window.addEventListener('resize', () => { resize(); initNodes(); });
+window.addEventListener('mousemove', e => { mouse.x = e.clientX; mouse.y = e.clientY; });
+resize(); initNodes();
+
+// SCROLL REVEAL
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.1 });
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
